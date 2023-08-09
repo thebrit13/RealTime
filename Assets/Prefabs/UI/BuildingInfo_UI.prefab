@@ -121,8 +121,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 878300110006964417}
-        m_TargetAssemblyTypeName: UnitBuilding_UI, Assembly-CSharp
+      - m_Target: {fileID: 5862180427009564863}
+        m_TargetAssemblyTypeName: BuildingInfo_UI, Assembly-CSharp
         m_MethodName: OnClickClose
         m_Mode: 1
         m_Arguments:
@@ -276,9 +276,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6494906481275404942}
-  - component: {fileID: 878300110006964417}
+  - component: {fileID: 5862180427009564863}
   m_Layer: 0
-  m_Name: UnitBuilding_UI
+  m_Name: BuildingInfo_UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -306,7 +306,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 300, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &878300110006964417
+--- !u!114 &5862180427009564863
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -315,12 +315,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6376269526653192103}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d5cb4e5b04c200419e7ff5587679ada, type: 3}
+  m_Script: {fileID: 11500000, guid: 7c118dccb53061741bfcece0e559d49c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _Content: {fileID: 424734482576906286}
-  _UnitObject: {fileID: 7473052367827033444, guid: a8df3137e2abc0a41a6eb0da207da7c4,
+  _UnitObject: {fileID: -8696519802463382089, guid: 3c41b9c10f10d7c4e8fd47d29c885123,
     type: 3}
+  _Content: {fileID: 424734482576906286}
 --- !u!1 &6973428566158051412
 GameObject:
   m_ObjectHideFlags: 0

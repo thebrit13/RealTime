@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BuildingManager : MonoBehaviour
 {
+    [SerializeField] private UnitManager _UnitManager;
     [SerializeField] private BaseBuilding _BaseBuilding;
 
     private BaseBuilding _CreatedBaseBuilding;
@@ -29,13 +30,11 @@ public class BuildingManager : MonoBehaviour
         {
             _CreatedBaseBuilding.transform.position = _MouseWorldPos;
         }
-
-
     }
 
     public void PlaceBuilding()
     {
-        _CreatedBaseBuilding.Setup();
+        _CreatedBaseBuilding.Setup(1,_UnitManager.CreateUnit);
         _CreatedBaseBuilding = null;
     }
 
@@ -51,6 +50,7 @@ public class BuildingManager : MonoBehaviour
 
     public void SetMouseWorld(Vector3 pos)
     {
+        pos.y = 0;
         _MouseWorldPos = pos;
     }
 
@@ -58,15 +58,4 @@ public class BuildingManager : MonoBehaviour
     {
         return _CreatedBaseBuilding;
     }
-
-    ////Should consolidate so we arent doing this in two places
-    //private void SetMouseWorld()
-    //{
-    //    if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out _MouseHit))
-    //    {
-    //        _MouseWorldPos = _MouseHit.point;
-    //        _MouseWorldPos.y = 0;
-    //    }
-    //}
-
 }

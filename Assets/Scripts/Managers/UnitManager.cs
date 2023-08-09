@@ -32,10 +32,9 @@ public class UnitManager : MonoBehaviour
         _TaskManager?.Update();  
     }
 
-    private void CreateUnit()
+    public void CreateUnit(string id,Vector3 loc)
     {
-        //SetMouseWorld(false);
-        //_CreatedUnits.Add(Instantiate(_BaseUnit, _MouseWorldPos, Quaternion.identity));
+        _CreatedUnits.Add(Instantiate(_BaseUnit, loc, Quaternion.identity));
     }
 
     public void MoveSelectedCallback(List<BaseUnit> selectedUnits,Vector3 pos)

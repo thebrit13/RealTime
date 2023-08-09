@@ -92,7 +92,7 @@ public class SelectionManager : MonoBehaviour
                 }
                 else
                 {
-                    _WorldMouseUnitHit?.SetSelectionState(UnitSelectionState.NONE);
+                    _WorldMouseUnitHit?.SetSelectionState(UnitSelectionState.NONE,false);
                     _WorldMouseUnitHit = null;
                 }
             }
@@ -123,14 +123,14 @@ public class SelectionManager : MonoBehaviour
         //single selection
         if (_WorldMouseUnitHit?.GetType() == typeof(BaseUnit))
         {
-            _WorldMouseUnitHit.SetSelectionState(UnitSelectionState.SELECTED);
+            _WorldMouseUnitHit.SetSelectionState(UnitSelectionState.SELECTED,true);
             _SelectedUnits.Add(_WorldMouseUnitHit.GetComponent<BaseUnit>());
-            //UIManager.Instance?.ShowInfo_Unit()?.Set(_SelectedUnits[0]);
+            UIManager.Instance?.ShowInfo_Unit()?.Set(_SelectedUnits[0]);
             return;
         }
         else if(_WorldMouseUnitHit?.GetType() == typeof(BaseBuilding))
         {
-            _WorldMouseUnitHit.SetSelectionState(UnitSelectionState.SELECTED);
+            _WorldMouseUnitHit.SetSelectionState(UnitSelectionState.SELECTED,true);
             return;
         }
 
@@ -142,29 +142,29 @@ public class SelectionManager : MonoBehaviour
         {
             if (IsInSelection(bu.transform.position, topLeft, bottomRight))
             {
-                bu.SetSelectionState(UnitSelectionState.SELECTED);
+                bu.SetSelectionState(UnitSelectionState.SELECTED,false);
                 _SelectedUnits.Add(bu);
             }
         }
 
-        //if (_SelectedUnits.Count == 1)
-        //{
-        //    UIManager.Instance?.ShowInfo_Unit()?.Set(_SelectedUnits[0]);
-        //}
-        //else if (_SelectedUnits.Count > 1)
-        //{
-        //    UIManager.Instance?.ShowInfo_UnitMult()?.Set(_SelectedUnits);
-        //}
+        if (_SelectedUnits.Count == 1)
+        {
+            UIManager.Instance?.ShowInfo_Unit()?.Set(_SelectedUnits[0]);
+        }
+        else if (_SelectedUnits.Count > 1)
+        {
+            UIManager.Instance?.ShowInfo_UnitMult()?.Set(_SelectedUnits);
+        }
     }
 
     private void ClearSelectedUnits()
     { 
         foreach (BaseUnit bu in _SelectedUnits)
         {
-            bu.SetSelectionState(UnitSelectionState.NONE);
+            bu.SetSelectionState(UnitSelectionState.NONE,false);
         }
         _SelectedUnits.Clear();
-        //UIManager.Instance?.HideInfo();
+        UIManager.Instance?.HideInfo();
     }
 
     private bool IsInSelection(Vector3 testLoc, Vector3 topLeft, Vector3 bottomRight)

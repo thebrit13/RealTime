@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 
@@ -15,7 +12,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private UnitInfoMult_UI _UnitInfoMulitUI;
 
     [Header("Building UI")]
-    [SerializeField] private UnitBuilding_UI _UnitBuildingUI;
+    [SerializeField] private Building_UI _BuildingUI;
+    [SerializeField] private BuildingInfo_UI _BuildingInfoUI;
 
     private GameObject _ActiveInfoUI = null;
 
@@ -36,7 +34,7 @@ public class UIManager : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.B))
         {
-            ShowInfo_Building();
+            Show_Building();
         }
     }
 
@@ -63,13 +61,22 @@ public class UIManager : MonoBehaviour
         return _UnitInfoMulitUI;
     }
 
-    public UnitBuilding_UI ShowInfo_Building()
+    public Building_UI Show_Building()
     {
-        ShowUI_Master(_UnitBuildingUI.gameObject);
+        ShowUI_Master(_BuildingUI.gameObject);
 
-        _UnitBuildingUI.Set();
+        _BuildingUI.Set();
 
-        return _UnitBuildingUI;
+        return _BuildingUI;
+    }
+
+    public BuildingInfo_UI ShowInfo_Building(System.Action<string> createUnitCallback)
+    {
+        ShowUI_Master(_BuildingInfoUI.gameObject);
+
+        _BuildingInfoUI.Set(createUnitCallback);
+
+        return _BuildingInfoUI;
     }
     #endregion
 
@@ -88,7 +95,8 @@ public class UIManager : MonoBehaviour
         _UnitInfoMulitUI.gameObject.SetActive(false);
 
         //Building
-        _UnitBuildingUI.gameObject.SetActive(false);
+        _BuildingUI.gameObject.SetActive(false);
+        _BuildingInfoUI.gameObject.SetActive(false);
     }
 
     public static void RemovedChildren(Transform transform)

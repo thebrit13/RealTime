@@ -16,19 +16,18 @@ public class BaseSelectable : MonoBehaviour
 
     private int _Team;
 
-    private System.Action _SelectionCallback;
-
     private bool _Movable;
+
+    protected System.Action OnClick;
 
     public bool IsMovable()
     {
         return _Movable;
     }
 
-    public void Setup(int teamNumber,System.Action selectionCallback)
+    public virtual void Setup(int teamNumber)
     {
         _Team = teamNumber;
-        _SelectionCallback = selectionCallback;
     }
 
     public virtual void Awake()
@@ -36,7 +35,7 @@ public class BaseSelectable : MonoBehaviour
         _Selected2D.SetActive(false);
     }
 
-    public void SetSelectionState(UnitSelectionState uss)
+    public void SetSelectionState(UnitSelectionState uss,bool singleSelect)
     {
         if (_Active2D)
         {
@@ -47,7 +46,10 @@ public class BaseSelectable : MonoBehaviour
         {
             case UnitSelectionState.SELECTED:
                 _Active2D = _Selected2D;
-                _SelectionCallback?.Invoke();
+                if(singleSelect)
+                {
+                    OnClick?.Invoke();
+                }
                 break;
             case UnitSelectionState.NONE:
                 return;
