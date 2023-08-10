@@ -11,25 +11,15 @@ public class UnitManager : MonoBehaviour
 
     private List<BaseUnit> _CreatedUnits = new List<BaseUnit>();
 
-    private TaskManager _TaskManager;
-
     private void Awake()
     {
-        _TaskManager = new TaskManager();
+        EventManager.OnUnitDeath += OnUnitDeath;
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        _CreatedUnits.Add(Instantiate(_BaseUnit,new Vector3(0,0,0),Quaternion.identity));
-        _CreatedUnits.Add(Instantiate(_BaseUnit,new Vector3(2,0,0),Quaternion.identity));
-        _CreatedUnits.Add(Instantiate(_BaseUnit,new Vector3(4,0,0),Quaternion.identity));
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        _TaskManager?.Update();  
+        _CreatedUnits.Add(Instantiate(_BaseUnit, Vector3.zero, Quaternion.identity));
     }
 
     public void CreateUnit(string id,Vector3 loc)
@@ -48,5 +38,20 @@ public class UnitManager : MonoBehaviour
     public List<BaseUnit> GetCreatedUnits()
     {
         return _CreatedUnits;
+    }
+
+    private void OnUnitDeath(BaseUnit bu)
+    {
+        if(!bu)
+        {
+            return;
+        }
+
+        _CreatedUnits.Remove(bu);
+    }
+
+    private void OnDestroy()
+    {
+        EventManager.OnUnitDeath -= OnUnitDeath;
     }
 }

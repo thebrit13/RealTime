@@ -5,16 +5,38 @@ using UnityEngine.AI;
 
 public class BaseUnit : BaseSelectable
 {
-    [SerializeField] private NavMeshAgent _NMA;
+    [SerializeField] protected NavMeshAgent _NMA;
+
+    protected TaskManager _TaskManager = new TaskManager();
 
     public override void Awake()
     {
         base.Awake();
+        //to active nav mesh agent when spawned, might not need
         _NMA.SetDestination(this.transform.position + this.transform.forward);
+
+        _TaskManager.Setup(this, MoveToInternal);
+    }
+
+    private void Update()
+    {
+        _TaskManager?.UpdateTaskManager();
     }
 
     public void MoveTo(Vector3 dest)
     {
+        _TaskManager.AddTask(dest);
+    }
+
+    private void MoveToInternal(Vector3 dest)
+    {
         _NMA.SetDestination(dest);
+    }
+
+   
+
+    private void OnDestroy()
+    {
+        EventManager.OnUnitDeath?.Invoke(this);
     }
 }

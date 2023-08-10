@@ -18,6 +18,8 @@ public class BaseSelectable : MonoBehaviour
 
     private bool _Movable;
 
+    private int _Health = 5;
+
     protected System.Action OnClick;
 
     public bool IsMovable()
@@ -58,6 +60,16 @@ public class BaseSelectable : MonoBehaviour
         if (_Active2D)
         {
             _Active2D.SetActive(true);
+        }
+    }
+
+    public void TakeDamage(int amt)
+    {
+        Debug.Log("Take damage");
+        _Health -= amt;
+        if(_Health <= 0)
+        {
+            Destroy(this.gameObject);
         }
     }
 }

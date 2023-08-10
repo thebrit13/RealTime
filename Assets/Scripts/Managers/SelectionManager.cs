@@ -88,7 +88,7 @@ public class SelectionManager : MonoBehaviour
             {
                 if (_MouseHit.transform.tag == "Unit" || _MouseHit.transform.tag == "Building")
                 {
-                    _WorldMouseUnitHit = _MouseHit.transform.parent.GetComponent<BaseSelectable>();
+                    _WorldMouseUnitHit = _MouseHit.transform.GetComponent<BaseSelectable>();
                 }
                 else
                 {
