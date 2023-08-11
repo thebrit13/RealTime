@@ -7,7 +7,7 @@ public class BaseUnit : BaseSelectable
 {
     [SerializeField] protected NavMeshAgent _NMA;
 
-    protected TaskManager _TaskManager = new TaskManager();
+    protected TaskManager _TaskManager;
 
     public override void Awake()
     {
@@ -15,6 +15,7 @@ public class BaseUnit : BaseSelectable
         //to active nav mesh agent when spawned, might not need
         _NMA.SetDestination(this.transform.position + this.transform.forward);
 
+        _TaskManager = new TaskManager();
         _TaskManager.Setup(this, MoveToInternal);
     }
 
@@ -26,6 +27,11 @@ public class BaseUnit : BaseSelectable
     public void MoveTo(Vector3 dest)
     {
         _TaskManager.AddTask(dest);
+    }
+
+    public void MoveToWork()
+    {
+
     }
 
     private void MoveToInternal(Vector3 dest)

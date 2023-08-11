@@ -35,6 +35,11 @@ public class UnitManager : MonoBehaviour
         }
     }
 
+    public void MoveToWorkCallback(Unit_Worker worker, Vector3 pos)
+    {
+
+    }
+
     public List<BaseUnit> GetCreatedUnits()
     {
         return _CreatedUnits;

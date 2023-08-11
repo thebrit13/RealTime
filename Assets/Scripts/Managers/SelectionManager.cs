@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,6 +18,7 @@ public class SelectionManager : MonoBehaviour
     private bool _SelectionInProgress = false;
 
     private BaseSelectable _WorldMouseUnitHit = null;
+    private BaseWorkable _WorldMouseWorkableHit = null;
 
     private List<BaseUnit> _SelectedUnits = new List<BaseUnit>();
 
@@ -42,7 +44,7 @@ public class SelectionManager : MonoBehaviour
 
         if(_BuildingManagerRef?.IsPlacing() == true)
         {
-            SetMouseWorld(false);
+            SetMouseWorld(false,false);
             _BuildingManagerRef?.SetMouseWorld(_MouseWorldPos);
             if (Input.GetMouseButtonDown(0))
             {
@@ -53,7 +55,7 @@ public class SelectionManager : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            SetMouseWorld(true);
+            SetMouseWorld(true,false);
             SelectionBegin();
         }
 
@@ -66,19 +68,27 @@ public class SelectionManager : MonoBehaviour
         {
             if(_SelectedUnits?.Count > 0)
             {
-                SetMouseWorld(false);
-                _UnitManagerRef?.MoveSelectedCallback(_SelectedUnits, _MouseWorldPos);
+                //if(_SelectedUnits?.Count == 1 && _SelectedUnits[0].GetType() == typeof(Unit_Worker))
+                //{
+                //    SetMouseWorld(true,true);
+                //    _UnitManagerRef?.MoveToWorkCallback((Unit_Worker)_SelectedUnits[0], _MouseWorldPos);
+                //}
+                //else
+                {
+                    SetMouseWorld(true,true);
+                    _UnitManagerRef?.MoveSelectedCallback(_SelectedUnits, _MouseWorldPos);
+                }
             }
         }
 
         if (_SelectionInProgress)
         {
-            SetMouseWorld(false);
+            SetMouseWorld(false,false);
             UpdateSelectionLine();
         }
     }
 
-    private void SetMouseWorld(bool checkForUnit)
+    private void SetMouseWorld(bool checkForUnit,bool checkForWorkable)
     {
         if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out _MouseHit))
         {
@@ -94,6 +104,18 @@ public class SelectionManager : MonoBehaviour
                 {
                     _WorldMouseUnitHit?.SetSelectionState(UnitSelectionState.NONE,false);
                     _WorldMouseUnitHit = null;
+                }
+            }
+
+            if(checkForWorkable)
+            {
+                if (_MouseHit.transform.tag == "Workable")
+                {
+                    _WorldMouseWorkableHit = _MouseHit.transform.GetComponent<BaseWorkable>();
+                }
+                else
+                {
+                    _WorldMouseWorkableHit = null;
                 }
             }
         }
@@ -121,17 +143,20 @@ public class SelectionManager : MonoBehaviour
         ClearSelectedUnits();
 
         //single selection
-        if (_WorldMouseUnitHit?.GetType() == typeof(BaseUnit))
+        if(_WorldMouseUnitHit)
         {
-            _WorldMouseUnitHit.SetSelectionState(UnitSelectionState.SELECTED,true);
-            _SelectedUnits.Add(_WorldMouseUnitHit.GetComponent<BaseUnit>());
-            UIManager.Instance?.ShowInfo_Unit()?.Set(_SelectedUnits[0]);
-            return;
-        }
-        else if(_WorldMouseUnitHit?.GetType() == typeof(BaseBuilding))
-        {
-            _WorldMouseUnitHit.SetSelectionState(UnitSelectionState.SELECTED,true);
-            return;
+            if (_WorldMouseUnitHit.GetType().IsSubclassOf(typeof(BaseUnit)))
+            {
+                _WorldMouseUnitHit.SetSelectionState(UnitSelectionState.SELECTED, true);
+                _SelectedUnits.Add(_WorldMouseUnitHit.GetComponent<BaseUnit>());
+                UIManager.Instance?.ShowInfo_Unit()?.Set(_SelectedUnits[0]);
+                return;
+            }
+            else if (_WorldMouseUnitHit.GetType().IsSubclassOf(typeof(BaseBuilding)))
+            {
+                _WorldMouseUnitHit.SetSelectionState(UnitSelectionState.SELECTED, true);
+                return;
+            }
         }
 
         //Multi select for units only
