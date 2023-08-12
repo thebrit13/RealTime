@@ -35,9 +35,12 @@ public class UnitManager : MonoBehaviour
         }
     }
 
-    public void MoveToWorkCallback(Unit_Worker worker, Vector3 pos)
+    public void StartWorkCallback(List<BaseUnit> workers, BaseWorkable bw)
     {
-
+        foreach (BaseUnit bu in workers)
+        {
+            ((Unit_Worker)bu).StartWork(bw);
+        }
     }
 
     public List<BaseUnit> GetCreatedUnits()

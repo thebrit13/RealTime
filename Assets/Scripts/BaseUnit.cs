@@ -29,16 +29,10 @@ public class BaseUnit : BaseSelectable
         _TaskManager.AddTask(dest);
     }
 
-    public void MoveToWork()
-    {
-
-    }
-
     private void MoveToInternal(Vector3 dest)
     {
         _NMA.SetDestination(dest);
     }
-
    
 
     private void OnDestroy()

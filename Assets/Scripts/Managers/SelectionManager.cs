@@ -76,7 +76,15 @@ public class SelectionManager : MonoBehaviour
                 //else
                 {
                     SetMouseWorld(true,true);
-                    _UnitManagerRef?.MoveSelectedCallback(_SelectedUnits, _MouseWorldPos);
+                    if(_WorldMouseWorkableHit != null)
+                    {
+                        _UnitManagerRef?.StartWorkCallback(_SelectedUnits,_WorldMouseWorkableHit);
+                    }
+                    else
+                    {
+                        _UnitManagerRef?.MoveSelectedCallback(_SelectedUnits, _MouseWorldPos);
+                    }
+                    
                 }
             }
         }
@@ -111,7 +119,7 @@ public class SelectionManager : MonoBehaviour
             {
                 if (_MouseHit.transform.tag == "Workable")
                 {
-                    _WorldMouseWorkableHit = _MouseHit.transform.GetComponent<BaseWorkable>();
+                    _WorldMouseWorkableHit = _MouseHit.transform.parent.GetComponent<BaseWorkable>();
                 }
                 else
                 {

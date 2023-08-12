@@ -5,9 +5,12 @@ using UnityEngine;
 
 public enum TaskType
 {
+    NONE,
     MOVE,
     WAIT,
-    WORK
+    WORK,
+    DEPOSIT,
+    LOOP
 }
 
 public class TaskManager
@@ -22,6 +25,7 @@ public class TaskManager
     private System.Action<Vector3> _MoveToCallback;
 
     private const float STOPPING_DISTANCE_FOR_MOVE = .5f;
+    private const float STOPPING_DISTANCE_FOR_WORK = 2.0f;
 
     private BaseUnit _BaseUnitRef;
 
@@ -53,13 +57,51 @@ public class TaskManager
 
     public void AddTask(BaseWorkable workable, bool addTask = false)
     {
-        TaskObject_Work to = new TaskObject_Work();
-        AddTaskInternal(to,addTask);
+        TaskObject_Work to = new TaskObject_Work()
+        {
+            CurrentTaskType = TaskType.WORK,
+            Workable = workable
+        };
+
+        TaskObject_Wait to2 = new TaskObject_Wait()
+        {
+            CurrentTaskType = TaskType.WAIT,
+            Duration = 2.0f
+        };
+
+        TaskObject_Move to3 = new TaskObject_Move()
+        {
+            CurrentTaskType = TaskType.MOVE,
+            Destination = Vector3.zero
+        };
+
+        List<TaskObject> loopTasks = new List<TaskObject>();
+        loopTasks.Add(to);
+        loopTasks.Add(to2);
+        loopTasks.Add(to3);
+
+        TaskObject_Loop toLoop = new TaskObject_Loop()
+        {
+            CurrentTaskType = TaskType.LOOP,
+            TaskObjectLoop = loopTasks
+        };
+
+        AddTaskInternal(toLoop,addTask);
     }
+
+    //Need some sort of way to deposit 
+    //public void AddTask(BaseWorkable workable, bool addTask = false)
+    //{
+    //    TaskObject_Work to = new TaskObject_Work()
+    //    {
+    //        Workable = workable
+    //    };
+    //    AddTaskInternal(to, addTask);
+    //}
 
     private void AddTaskInternal(TaskObject to,bool addTask)
     {
-        if(!addTask || !Input.GetKey(KeyCode.LeftShift))
+        if(!addTask) //|| !Input.GetKey(KeyCode.LeftShift))
         {
             _TaskQueue.Clear();
             _CurrentTask = null;
@@ -89,45 +131,86 @@ public class TaskManager
 
     private void SetupTask()
     {
-        switch (_CurrentTask.CurrentTaskType)
-        {
-            case TaskType.MOVE:
-                _MoveToCallback?.Invoke(((TaskObject_Move)_CurrentTask).Destination);
-                break;
-            case TaskType.WAIT:
-                //Double cast, not great
-                ((TaskObject_Wait)_CurrentTask).EndTime = DateTime.Now.AddSeconds(((TaskObject_Wait)_CurrentTask).Duration);
-                break;
-            case TaskType.WORK:
-                break;
-        }
+        //probably want to make this a function
+        TaskObject taskObjectOverride = null;
+        CheckForLoopOverride(ref taskObjectOverride);
+
+        SwitchSetup(taskObjectOverride != null ? taskObjectOverride : _CurrentTask);
     }
 
     private void UpdateTask()
     {
+        TaskObject taskObjectOverride = null;
+        CheckForLoopOverride(ref taskObjectOverride);
+
+        bool taskDone = SwitchUpdate(taskObjectOverride != null ? taskObjectOverride : _CurrentTask);
+
+        if(taskDone)
+        {
+            if(_CurrentTask.CurrentTaskType == TaskType.LOOP)
+            {
+                ((TaskObject_Loop)_CurrentTask).UpdateIndex();
+                SetupTask();
+            }
+            else
+            {
+                _CurrentTask.FinishCallback?.Invoke();
+                _CurrentTask = null;
+            }
+
+        }
+    }
+
+    private void CheckForLoopOverride(ref TaskObject taskObjectOverride)
+    {
+        if (_CurrentTask.CurrentTaskType == TaskType.LOOP)
+        {
+            //Double cast, not great
+            taskObjectOverride = ((TaskObject_Loop)_CurrentTask).TaskObjectLoop[((TaskObject_Loop)_CurrentTask).TaskIndex];
+        }
+    }
+
+    private bool SwitchUpdate(TaskObject taskObject)
+    {
         bool taskDone = false;
-        switch(_CurrentTask.CurrentTaskType)
+        switch (taskObject.CurrentTaskType)
         {
             case TaskType.MOVE:
-                if(Vector3.Distance(((TaskObject_Move)_CurrentTask).Destination,_BaseUnitRef.transform.position) < STOPPING_DISTANCE_FOR_MOVE)
+                if (Vector3.Distance(((TaskObject_Move)taskObject).Destination, _BaseUnitRef.transform.position) < STOPPING_DISTANCE_FOR_MOVE)
                 {
                     taskDone = true;
                 }
                 break;
             case TaskType.WAIT:
-                if(DateTime.Now >= ((TaskObject_Wait)_CurrentTask).EndTime)
+                if (DateTime.Now >= ((TaskObject_Wait)taskObject).EndTime)
                 {
                     taskDone = true;
                 }
                 break;
             case TaskType.WORK:
+                if (Vector3.Distance(((TaskObject_Work)taskObject).Workable.transform.position, _BaseUnitRef.transform.position) < STOPPING_DISTANCE_FOR_WORK)
+                {
+                    taskDone = true;
+                }
                 break;
         }
+        return taskDone;
+    }
 
-        if(taskDone)
+    private void SwitchSetup(TaskObject taskObject)
+    {
+        switch (taskObject.CurrentTaskType)
         {
-            _CurrentTask.FinishCallback?.Invoke();
-            _CurrentTask = null;
+            case TaskType.MOVE:
+                _MoveToCallback?.Invoke(((TaskObject_Move)taskObject).Destination);
+                break;
+            case TaskType.WAIT:
+                //Double cast, not great
+                ((TaskObject_Wait)taskObject).EndTime = DateTime.Now.AddSeconds(((TaskObject_Wait)taskObject).Duration);
+                break;
+            case TaskType.WORK:
+                _MoveToCallback?.Invoke(((TaskObject_Work)taskObject).Workable.transform.position);
+                break;
         }
     }
 }
@@ -152,4 +235,19 @@ public class TaskObject_Move:TaskObject
 public class TaskObject_Work:TaskObject
 {
     public BaseWorkable Workable;
+}
+
+public class TaskObject_Loop : TaskObject
+{
+    public int TaskIndex = 0;
+    public List<TaskObject> TaskObjectLoop;
+
+    public void UpdateIndex()
+    {
+        ++TaskIndex;
+        if(TaskIndex >= TaskObjectLoop.Count)
+        {
+            TaskIndex = 0;
+        }
+    }
 }

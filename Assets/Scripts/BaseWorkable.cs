@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class BaseWorkable : MonoBehaviour
 {
-    private BaseUnit _CurrentWorker;
+    private const int MAX_WORKERS = 4;
+
+    private List<Unit_Worker> _CurrentWorkers;
 
     private void OnTriggerEnter(Collider other)
     {
