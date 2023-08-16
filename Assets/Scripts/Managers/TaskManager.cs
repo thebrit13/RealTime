@@ -9,7 +9,6 @@ public enum TaskType
     MOVE,
     WAIT,
     WORK,
-    DEPOSIT,
     LOOP
 }
 
@@ -24,7 +23,7 @@ public class TaskManager
 
     private System.Action<Vector3> _MoveToCallback;
 
-    private const float STOPPING_DISTANCE_FOR_MOVE = .5f;
+    private const float STOPPING_DISTANCE_FOR_MOVE = 2.0f;
     private const float STOPPING_DISTANCE_FOR_WORK = 2.0f;
 
     private BaseUnit _BaseUnitRef;
@@ -55,24 +54,26 @@ public class TaskManager
         AddTaskInternal(to,addTask);
     }
 
-    public void AddTask(BaseWorkable workable, bool addTask = false)
+    public void AddTask(BaseWorkable workable,System.Action workStopCallback,System.Action dropOffCallback,bool addTask = false)
     {
-        TaskObject_Work to = new TaskObject_Work()
+        TaskObject_Move to = new TaskObject_Move()
         {
-            CurrentTaskType = TaskType.WORK,
-            Workable = workable
+            CurrentTaskType = TaskType.MOVE,
+            Destination = workable.transform.position
         };
 
-        TaskObject_Wait to2 = new TaskObject_Wait()
+        TaskObject_Work to2 = new TaskObject_Work()
         {
-            CurrentTaskType = TaskType.WAIT,
-            Duration = 2.0f
+            CurrentTaskType = TaskType.WORK,
+            Workable = workable,
+            FinishCallback = workStopCallback
         };
 
         TaskObject_Move to3 = new TaskObject_Move()
         {
             CurrentTaskType = TaskType.MOVE,
-            Destination = Vector3.zero
+            Destination = Vector3.zero,
+            FinishCallback = dropOffCallback
         };
 
         List<TaskObject> loopTasks = new List<TaskObject>();
@@ -88,16 +89,6 @@ public class TaskManager
 
         AddTaskInternal(toLoop,addTask);
     }
-
-    //Need some sort of way to deposit 
-    //public void AddTask(BaseWorkable workable, bool addTask = false)
-    //{
-    //    TaskObject_Work to = new TaskObject_Work()
-    //    {
-    //        Workable = workable
-    //    };
-    //    AddTaskInternal(to, addTask);
-    //}
 
     private void AddTaskInternal(TaskObject to,bool addTask)
     {
@@ -149,6 +140,7 @@ public class TaskManager
         {
             if(_CurrentTask.CurrentTaskType == TaskType.LOOP)
             {
+                taskObjectOverride?.FinishCallback?.Invoke();
                 ((TaskObject_Loop)_CurrentTask).UpdateIndex();
                 SetupTask();
             }
@@ -188,7 +180,7 @@ public class TaskManager
                 }
                 break;
             case TaskType.WORK:
-                if (Vector3.Distance(((TaskObject_Work)taskObject).Workable.transform.position, _BaseUnitRef.transform.position) < STOPPING_DISTANCE_FOR_WORK)
+                if (((Unit_Worker)_BaseUnitRef).IsFull())
                 {
                     taskDone = true;
                 }
@@ -209,7 +201,7 @@ public class TaskManager
                 ((TaskObject_Wait)taskObject).EndTime = DateTime.Now.AddSeconds(((TaskObject_Wait)taskObject).Duration);
                 break;
             case TaskType.WORK:
-                _MoveToCallback?.Invoke(((TaskObject_Work)taskObject).Workable.transform.position);
+                ((Unit_Worker)_BaseUnitRef).StartWork();
                 break;
         }
     }
