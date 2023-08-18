@@ -160,7 +160,7 @@ public class SelectionManager : MonoBehaviour
                 UIManager.Instance?.ShowInfo_Unit()?.Set(_SelectedUnits[0]);
                 return;
             }
-            else if (_WorldMouseUnitHit.GetType().IsSubclassOf(typeof(BaseBuilding)))
+            else if (_WorldMouseUnitHit.GetType() == typeof(BaseBuilding) || _WorldMouseUnitHit.GetType().IsSubclassOf(typeof(BaseBuilding)))
             {
                 _WorldMouseUnitHit.SetSelectionState(UnitSelectionState.SELECTED, true);
                 return;

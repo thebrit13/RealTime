@@ -11,11 +11,14 @@ public class BuildingManager : MonoBehaviour
 
     private Vector3 _MouseWorldPos;
 
+    private List<BaseBuilding> _CreatedBuildings = new List<BaseBuilding>();
+
     //private RaycastHit _MouseHit;
 
     private void Awake()
     {
         EventManager.OnClickCreateBuilding += CreateBuildingAtWorldPos;
+        EventManager.GetClosestDropOff += GetClosestDropOffLocation;
     }
 
     // Start is called before the first frame update
@@ -29,12 +32,17 @@ public class BuildingManager : MonoBehaviour
         if(_CreatedBaseBuilding)
         {
             _CreatedBaseBuilding.transform.position = _MouseWorldPos;
+            if(Input.GetKeyDown(KeyCode.Escape))
+            {
+                Destroy(_CreatedBaseBuilding.gameObject);
+            }
         }
     }
 
     public void PlaceBuilding()
     {
         _CreatedBaseBuilding.Setup(1,_UnitManager.CreateUnit);
+        _CreatedBuildings.Add(_CreatedBaseBuilding);
         _CreatedBaseBuilding = null;
     }
 
@@ -46,6 +54,7 @@ public class BuildingManager : MonoBehaviour
     private void OnDestroy()
     {
         EventManager.OnClickCreateBuilding -= CreateBuildingAtWorldPos;
+        EventManager.GetClosestDropOff -= GetClosestDropOffLocation;
     }
 
     public void SetMouseWorld(Vector3 pos)
@@ -57,5 +66,12 @@ public class BuildingManager : MonoBehaviour
     public bool IsPlacing()
     {
         return _CreatedBaseBuilding;
+    }
+
+    public Vector3 GetClosestDropOffLocation(Vector3 workableLocation)
+    {
+        List<BaseBuilding> eligibleBuildings = _CreatedBuildings.FindAll(o => o.IsDropOffPoint);
+        eligibleBuildings.Sort((x, y) => Vector3.Distance(x.transform.position, workableLocation).CompareTo(Vector3.Distance(y.transform.position, workableLocation)));
+        return (eligibleBuildings.Count > 0 ? eligibleBuildings[0].transform.position : workableLocation);
     }
 }

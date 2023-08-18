@@ -23,8 +23,9 @@ public class TaskManager
 
     private System.Action<Vector3> _MoveToCallback;
 
-    private const float STOPPING_DISTANCE_FOR_MOVE = 2.0f;
+    private const float STOPPING_DISTANCE_FOR_MOVE = 1.0f;
     private const float STOPPING_DISTANCE_FOR_WORK = 2.0f;
+    private const float STOPPING_DISTANCE_FOR_DROPOFF = 4.0f;
 
     private BaseUnit _BaseUnitRef;
 
@@ -54,12 +55,13 @@ public class TaskManager
         AddTaskInternal(to,addTask);
     }
 
-    public void AddTask(BaseWorkable workable,System.Action workStopCallback,System.Action dropOffCallback,bool addTask = false)
+    public void AddTask(BaseWorkable workable,Vector3 dropOffLoc,System.Action workStopCallback,System.Action dropOffCallback,bool addTask = false)
     {
         TaskObject_Move to = new TaskObject_Move()
         {
             CurrentTaskType = TaskType.MOVE,
-            Destination = workable.transform.position
+            Destination = workable.transform.position,
+            StoppingDistance = STOPPING_DISTANCE_FOR_WORK
         };
 
         TaskObject_Work to2 = new TaskObject_Work()
@@ -72,7 +74,8 @@ public class TaskManager
         TaskObject_Move to3 = new TaskObject_Move()
         {
             CurrentTaskType = TaskType.MOVE,
-            Destination = Vector3.zero,
+            StoppingDistance = STOPPING_DISTANCE_FOR_DROPOFF,
+            Destination = dropOffLoc,
             FinishCallback = dropOffCallback
         };
 
@@ -168,7 +171,8 @@ public class TaskManager
         switch (taskObject.CurrentTaskType)
         {
             case TaskType.MOVE:
-                if (Vector3.Distance(((TaskObject_Move)taskObject).Destination, _BaseUnitRef.transform.position) < STOPPING_DISTANCE_FOR_MOVE)
+                //double cast!!
+                if (Vector3.Distance(((TaskObject_Move)taskObject).Destination, _BaseUnitRef.transform.position) < ((TaskObject_Move)taskObject).StoppingDistance)
                 {
                     taskDone = true;
                 }
@@ -222,6 +226,7 @@ public class TaskObject_Wait : TaskObject
 public class TaskObject_Move:TaskObject
 {
     public Vector3 Destination;
+    public float StoppingDistance;
 }
 
 public class TaskObject_Work:TaskObject

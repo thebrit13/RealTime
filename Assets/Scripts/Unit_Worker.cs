@@ -13,7 +13,9 @@ public class Unit_Worker : BaseUnit
 
     public void StartWorkTask(BaseWorkable bw)
     {
-        _TaskManager.AddTask(bw,StopWork,DropOffResources);
+        //Might need some sort of null check here
+        Vector3 dropOffLoc = EventManager.GetClosestDropOff.Invoke(bw.transform.position);
+        _TaskManager.AddTask(bw,dropOffLoc, StopWork,DropOffResources);
     }
 
     public void StartWork()
