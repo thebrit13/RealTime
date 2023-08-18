@@ -7,7 +7,7 @@ public class CameraManager : MonoBehaviour
     private const float MIN_CAMERA_MOVEMENT = 10;
     private const float MAX_CAMERA_MOVEMENT = 20;
 
-    private const float SCREEN_DETECT_MIN = 50;
+    private const float SCREEN_DETECT_MIN = 25;
 
     // Start is called before the first frame update
     void Start()

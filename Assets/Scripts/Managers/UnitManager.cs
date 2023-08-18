@@ -14,6 +14,7 @@ public class UnitManager : MonoBehaviour
     private void Awake()
     {
         EventManager.OnUnitDeath += OnUnitDeath;
+        EventManager.OnCreateUnit += CreateUnit;
     }
 
     // Start is called before the first frame update
@@ -61,5 +62,6 @@ public class UnitManager : MonoBehaviour
     private void OnDestroy()
     {
         EventManager.OnUnitDeath -= OnUnitDeath;
+        EventManager.OnCreateUnit -= CreateUnit;
     }
 }

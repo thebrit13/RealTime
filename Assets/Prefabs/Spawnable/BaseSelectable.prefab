@@ -49,6 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _Selected2D: {fileID: 5389660015333905491}
+  IsDropOffPoint: 0
 --- !u!54 &3953173305877514983
 Rigidbody:
   m_ObjectHideFlags: 0

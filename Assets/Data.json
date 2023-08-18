@@ -1,0 +1,14 @@
+{
+	"Buildings": {
+		"BuildingsList": [
+			{
+				"BuildingName": "Drop Off",
+				"PrefabName": "Building_DropOff"
+			},
+			{
+				"BuildingName": "Spawner",
+				"PrefabName": "Building_Spawner"
+			}
+		]
+	}
+}

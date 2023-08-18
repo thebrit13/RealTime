@@ -1,28 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Clickable_Object_UI : MonoBehaviour
 {
+    [SerializeField] private TextMeshProUGUI _ButtonName;
+
     private System.Action _ClickCallback;
-    private System.Action<string> _ClickCallbackString;
+    //private System.Action<string> _ClickCallbackString;
 
-    private string _ID;
+    private string _Name;
 
-    public void Set(System.Action clickCallback)
+    public virtual void Set(System.Action clickCallback)
     {
         _ClickCallback = clickCallback;
     }
 
-    public void Set(string id,System.Action<string> clickCallback)
+    public void Set(string buttonName, System.Action clickCallback)
     {
-        _ID = id;
-        _ClickCallbackString = clickCallback;
+        _ButtonName.text = buttonName;
+        _ClickCallback = clickCallback;
     }
 
     public void OnClick()
     {
         _ClickCallback?.Invoke();
-        _ClickCallbackString?.Invoke(_ID);
+        //_ClickCallbackString?.Invoke(_ID);
     }
 }

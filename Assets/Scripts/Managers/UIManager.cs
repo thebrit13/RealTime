@@ -5,23 +5,29 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
+
+
+    [HideInInspector]
     public bool OverUI;
+
+    [SerializeField] private Main_HUD _MainHUD;
 
     [Header("Info UI")]
     [SerializeField] private UnitInfo_UI _UnitInfoUI;
     [SerializeField] private UnitInfoMult_UI _UnitInfoMulitUI;
 
     [Header("Building UI")]
-    [SerializeField] private Building_UI _BuildingUI;
+    [SerializeField] private Building_UI _BuildingMenuUI;
     [SerializeField] private BuildingInfo_UI _BuildingInfoUI;
 
-    private GameObject _ActiveInfoUI = null;
+    private GameObject _ActiveUI = null;
 
     private void Awake()
     {
         Instance = this;
 
         HideAllInfo();
+        _MainHUD.Setup(Show_BuildingMenu);
     }
     // Start is called before the first frame update
     void Start()
@@ -32,10 +38,6 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.B))
-        {
-            Show_Building();
-        }
     }
 
     #region ShowUI
@@ -44,7 +46,7 @@ public class UIManager : MonoBehaviour
         HideInfo();
 
         uiObject.SetActive(true);
-        _ActiveInfoUI = uiObject;
+        _ActiveUI = uiObject;
     }
 
     public UnitInfo_UI ShowInfo_Unit()
@@ -61,20 +63,18 @@ public class UIManager : MonoBehaviour
         return _UnitInfoMulitUI;
     }
 
-    public Building_UI Show_Building()
+    public void Show_BuildingMenu()
     {
-        ShowUI_Master(_BuildingUI.gameObject);
+        ShowUI_Master(_BuildingMenuUI.gameObject);
 
-        _BuildingUI.Set();
-
-        return _BuildingUI;
+        _BuildingMenuUI.Set();
     }
 
-    public BuildingInfo_UI ShowInfo_Building(System.Action<string> createUnitCallback)
+    public BuildingInfo_UI ShowInfo_Building(System.Action<string> onClickOption)
     {
         ShowUI_Master(_BuildingInfoUI.gameObject);
 
-        _BuildingInfoUI.Set(createUnitCallback);
+        _BuildingInfoUI.Set(onClickOption);
 
         return _BuildingInfoUI;
     }
@@ -82,10 +82,7 @@ public class UIManager : MonoBehaviour
 
     public void HideInfo()
     {
-        if (_ActiveInfoUI)
-        {
-            _ActiveInfoUI.SetActive(false);
-        }
+        _ActiveUI?.SetActive(false);
     }
 
     private void HideAllInfo()
@@ -95,7 +92,7 @@ public class UIManager : MonoBehaviour
         _UnitInfoMulitUI.gameObject.SetActive(false);
 
         //Building
-        _BuildingUI.gameObject.SetActive(false);
+        _BuildingMenuUI.gameObject.SetActive(false);
         _BuildingInfoUI.gameObject.SetActive(false);
     }
 
@@ -105,5 +102,10 @@ public class UIManager : MonoBehaviour
         {
             Destroy(transform.GetChild(i).gameObject);
         }
+    }
+
+    public void SetResourceText(int amt)
+    {
+        _MainHUD.SetResourceText(amt);
     }
 }

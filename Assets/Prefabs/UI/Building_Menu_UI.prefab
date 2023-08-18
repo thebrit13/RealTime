@@ -278,7 +278,7 @@ GameObject:
   - component: {fileID: 6494906481275404942}
   - component: {fileID: 878300110006964417}
   m_Layer: 0
-  m_Name: Building_UI
+  m_Name: Building_Menu_UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

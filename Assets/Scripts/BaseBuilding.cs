@@ -10,7 +10,13 @@ public class BaseBuilding : BaseSelectable
     [SerializeField] private Collider _Collider;
     [SerializeField] private Transform _UnitSpawnLocation;
 
-    private System.Action<string,Vector3> _CreateUnitCallback;
+    [HideInInspector]
+    public bool IsDropOffPoint
+    {
+        get { return _BuildingType == BuildingType.SPAWNER; }
+    }
+
+    private BuildingType _BuildingType;
 
     public override void Awake()
     {
@@ -19,14 +25,14 @@ public class BaseBuilding : BaseSelectable
         _Collider.enabled = false;
     }
 
-    public void Setup(int teamNumber,System.Action<string,Vector3> createUnitCallback)
+    public void Setup(int teamNumber,BuildingType bt)
     {
         base.Setup(teamNumber);
         _NMO.enabled = true;
         _Collider.enabled = true;
         OnClick += OnClickFunc;
 
-        _CreateUnitCallback = createUnitCallback;
+        _BuildingType = bt;
     }
 
     private void OnClickFunc()
@@ -41,6 +47,6 @@ public class BaseBuilding : BaseSelectable
 
     private void CreateUnit(string id)
     {
-        _CreateUnitCallback?.Invoke(id, _UnitSpawnLocation.position);
+        EventManager.OnCreateUnit?.Invoke(id,_UnitSpawnLocation.position);
     }
 }

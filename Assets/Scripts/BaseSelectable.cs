@@ -12,8 +12,6 @@ public class BaseSelectable : MonoBehaviour
 {
     [SerializeField] GameObject _Selected2D;
 
-    public bool IsDropOffPoint;
-
     private GameObject _Active2D;
 
     private int _Team;

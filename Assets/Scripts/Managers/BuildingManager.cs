@@ -2,10 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum BuildingType
+{
+    SPAWNER,
+    DROPOFF
+}
+
 public class BuildingManager : MonoBehaviour
 {
     [SerializeField] private UnitManager _UnitManager;
-    [SerializeField] private BaseBuilding _BaseBuilding;
+    [SerializeField] private List<BaseBuilding> _Buildings;
 
     private BaseBuilding _CreatedBaseBuilding;
 
@@ -19,11 +25,6 @@ public class BuildingManager : MonoBehaviour
     {
         EventManager.OnClickCreateBuilding += CreateBuildingAtWorldPos;
         EventManager.GetClosestDropOff += GetClosestDropOffLocation;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
     }
 
     // Update is called once per frame
@@ -41,14 +42,21 @@ public class BuildingManager : MonoBehaviour
 
     public void PlaceBuilding()
     {
-        _CreatedBaseBuilding.Setup(1,_UnitManager.CreateUnit);
+        _CreatedBaseBuilding.Setup(1,BuildingType.SPAWNER);
         _CreatedBuildings.Add(_CreatedBaseBuilding);
         _CreatedBaseBuilding = null;
     }
 
-    public void CreateBuildingAtWorldPos()
+    public void CreateBuildingAtWorldPos(string prefabName)
     {
-        _CreatedBaseBuilding = Instantiate<BaseBuilding>(_BaseBuilding);
+        BaseBuilding buildingToCreate = _Buildings.Find(o => o.name == prefabName);
+
+        if(buildingToCreate)
+        {
+            _CreatedBaseBuilding = Instantiate<BaseBuilding>(buildingToCreate);
+        }
+
+        
     }
 
     private void OnDestroy()
