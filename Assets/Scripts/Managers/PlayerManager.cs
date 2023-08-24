@@ -50,4 +50,9 @@ public class PlayerManager : MonoBehaviour
     {
         return _DataManager.DataClass.Buildings.BuildingsList;
     }
+
+    public List<Data.Unit> GetUnits()
+    {
+        return _DataManager.DataClass.Units.UnitsList;
+    }
 }

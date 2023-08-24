@@ -11,8 +11,9 @@ public class Unit_Soldier : BaseUnit
 
     private Coroutine _AttackCo;
 
-    private void Update()
+    public override void Update()
     {
+        base.Update();
         if (_CurrentTarget)
         {
             this.transform.LookAt(_CurrentTarget.transform);

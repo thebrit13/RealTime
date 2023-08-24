@@ -19,7 +19,7 @@ public class BaseUnit : BaseSelectable
         _TaskManager.Setup(this, MoveToInternal);
     }
 
-    private void Update()
+    public virtual void Update()
     {
         _TaskManager?.UpdateTaskManager();
     }

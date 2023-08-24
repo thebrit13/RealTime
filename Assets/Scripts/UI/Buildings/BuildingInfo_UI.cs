@@ -11,10 +11,18 @@ public class BuildingInfo_UI : MonoBehaviour
     {
        UIManager.RemovedChildren(_Content);
 
-       Instantiate<BuildingUnit_Object_UI>(_UnitObject, _Content).Set("temp", delegate()
-       {
-           onClickOption("temp");
-       });
+        List<Data.Unit> Units = PlayerManager.Instance.GetUnits();
+        if (Units != null)
+        {
+            foreach (Data.Unit unit in Units)
+            {
+                Instantiate<BuildingUnit_Object_UI>(_UnitObject, _Content).Set(unit.UnitName, delegate ()
+                {
+                    onClickOption(unit.PrefabName);
+                    OnClickClose();
+                });
+            }
+        }
     }
 
     public void OnClickClose()

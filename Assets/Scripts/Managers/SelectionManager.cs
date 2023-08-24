@@ -68,23 +68,14 @@ public class SelectionManager : MonoBehaviour
         {
             if(_SelectedUnits?.Count > 0)
             {
-                //if(_SelectedUnits?.Count == 1 && _SelectedUnits[0].GetType() == typeof(Unit_Worker))
-                //{
-                //    SetMouseWorld(true,true);
-                //    _UnitManagerRef?.MoveToWorkCallback((Unit_Worker)_SelectedUnits[0], _MouseWorldPos);
-                //}
-                //else
+                SetMouseWorld(true, true);
+                if (_WorldMouseWorkableHit != null)
                 {
-                    SetMouseWorld(true,true);
-                    if(_WorldMouseWorkableHit != null)
-                    {
-                        _UnitManagerRef?.StartWorkCallback(_SelectedUnits,_WorldMouseWorkableHit);
-                    }
-                    else
-                    {
-                        _UnitManagerRef?.MoveSelectedCallback(_SelectedUnits, _MouseWorldPos);
-                    }
-                    
+                    _UnitManagerRef?.StartWorkCallback(_SelectedUnits, _WorldMouseWorkableHit);
+                }
+                else
+                {
+                    _UnitManagerRef?.MoveSelectedCallback(_SelectedUnits, _MouseWorldPos);
                 }
             }
         }
@@ -102,6 +93,8 @@ public class SelectionManager : MonoBehaviour
         {
             _MouseWorldPos = _MouseHit.point;
 
+            //LMB - check for unit to select
+            //RMB - check for unit to attack
             if (checkForUnit)
             {
                 if (_MouseHit.transform.tag == "Unit" || _MouseHit.transform.tag == "Building")
@@ -115,6 +108,7 @@ public class SelectionManager : MonoBehaviour
                 }
             }
 
+            //RM - check for tree/mine to work
             if(checkForWorkable)
             {
                 if (_MouseHit.transform.tag == "Workable")

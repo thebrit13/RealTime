@@ -45,8 +45,8 @@ public class BaseBuilding : BaseSelectable
         OnClick -= OnClickFunc;
     }
 
-    private void CreateUnit(string id)
+    private void CreateUnit(string prefabName)
     {
-        EventManager.OnCreateUnit?.Invoke(id,_UnitSpawnLocation.position);
+        EventManager.OnCreateUnit?.Invoke(prefabName, _UnitSpawnLocation.position);
     }
 }

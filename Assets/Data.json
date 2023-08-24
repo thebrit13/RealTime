@@ -10,5 +10,17 @@
 				"PrefabName": "Building_Spawner"
 			}
 		]
+	},
+	"Units": {
+		"UnitsList": [
+			{
+				"UnitName": "Worker",
+				"PrefabName": "UnitWorker"
+			},
+			{
+				"UnitName": "Soldier",
+				"PrefabName": "UnitSoldier"
+			}
+		]
 	}
 }

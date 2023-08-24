@@ -7,7 +7,7 @@ using UnityEngine.AI;
 public class UnitManager : MonoBehaviour
 {
     [Header("Units")]
-    [SerializeField] private BaseUnit _BaseUnit;
+    [SerializeField] private List<BaseUnit> _Units;
 
     private List<BaseUnit> _CreatedUnits = new List<BaseUnit>();
 
@@ -20,12 +20,16 @@ public class UnitManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _CreatedUnits.Add(Instantiate(_BaseUnit, Vector3.zero, Quaternion.identity));
+    
     }
 
-    public void CreateUnit(string id,Vector3 loc)
+    public void CreateUnit(string prefabName,Vector3 loc)
     {
-        _CreatedUnits.Add(Instantiate(_BaseUnit, loc, Quaternion.identity));
+        BaseUnit bu = _Units.Find(o => o.name == prefabName);
+        if(bu)
+        {
+            _CreatedUnits.Add(Instantiate(bu, loc, Quaternion.identity));
+        }    
     }
 
     public void MoveSelectedCallback(List<BaseUnit> selectedUnits,Vector3 pos)
@@ -40,7 +44,10 @@ public class UnitManager : MonoBehaviour
     {
         foreach (BaseUnit bu in workers)
         {
-            ((Unit_Worker)bu).StartWorkTask(bw);
+            if (bu.GetType() == typeof(Unit_Worker))
+            {
+                ((Unit_Worker)bu).StartWorkTask(bw);
+            }         
         }
     }
 

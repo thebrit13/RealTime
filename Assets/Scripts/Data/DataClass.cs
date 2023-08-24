@@ -28,13 +28,14 @@ namespace Data
     [Serializable]
     public class Units
     {
-        public List<Unit> UnitList;
+        public List<Unit> UnitsList;
     }
 
     [Serializable]
     public class Unit
     {
-
+        public string UnitName;
+        public string PrefabName;
     }
 }
 
