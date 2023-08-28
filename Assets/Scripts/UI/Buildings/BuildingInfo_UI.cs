@@ -7,7 +7,7 @@ public class BuildingInfo_UI : MonoBehaviour
     [SerializeField] private BuildingUnit_Object_UI _UnitObject;
     [SerializeField] private Transform _Content;
 
-    public void Set(System.Action<string> onClickOption)
+    public void Set(System.Action<Data.Unit> onClickOption)
     {
        UIManager.RemovedChildren(_Content);
 
@@ -18,7 +18,7 @@ public class BuildingInfo_UI : MonoBehaviour
             {
                 Instantiate<BuildingUnit_Object_UI>(_UnitObject, _Content).Set(unit.UnitName, delegate ()
                 {
-                    onClickOption(unit.PrefabName);
+                    onClickOption(unit);
                     OnClickClose();
                 });
             }

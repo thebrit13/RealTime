@@ -9,7 +9,8 @@ public enum TaskType
     MOVE,
     WAIT,
     WORK,
-    LOOP
+    ATTACK,
+    LIST
 }
 
 public class TaskManager
@@ -35,6 +36,12 @@ public class TaskManager
         _MoveToCallback = moveCallback;
     }
 
+    public void ClearAllTasks()
+    {
+        _TaskQueue.Clear();
+        _CurrentTask = null;
+    }
+
     public void AddTask(float duration, bool addTask = false)
     {
         TaskObject_Wait to = new TaskObject_Wait()
@@ -53,6 +60,29 @@ public class TaskManager
             Destination = destination
         };
         AddTaskInternal(to,addTask);
+    }
+
+    public void AddTask(BaseUnit enemyUnit,float timeBetweenAttacks,int damageAmt)
+    {
+        TaskObject_Attack to = new TaskObject_Attack()
+        {
+            CurrentTaskType = TaskType.ATTACK,
+            Enemy = enemyUnit,
+            TimeBetweenAttacks = timeBetweenAttacks,
+            DamageAmt = damageAmt
+        };
+
+        //List<TaskObject> loopTasks = new List<TaskObject>();
+        //loopTasks.Add(to);
+
+        //TaskObject_List toLoop = new TaskObject_List()
+        //{
+        //    CurrentTaskType = TaskType.LIST,
+        //    TaskObjectLoop = loopTasks,
+        //    ShouldLoop = true
+        //};
+
+        AddTaskInternal(to, false);
     }
 
     public void AddTask(BaseWorkable workable,Vector3 dropOffLoc,System.Action workStopCallback,System.Action dropOffCallback,bool addTask = false)
@@ -84,10 +114,11 @@ public class TaskManager
         loopTasks.Add(to2);
         loopTasks.Add(to3);
 
-        TaskObject_Loop toLoop = new TaskObject_Loop()
+        TaskObject_List toLoop = new TaskObject_List()
         {
-            CurrentTaskType = TaskType.LOOP,
-            TaskObjectLoop = loopTasks
+            CurrentTaskType = TaskType.LIST,
+            TaskObjectLoop = loopTasks,
+            ShouldLoop = true
         };
 
         AddTaskInternal(toLoop,addTask);
@@ -125,9 +156,8 @@ public class TaskManager
 
     private void SetupTask()
     {
-        //probably want to make this a function
         TaskObject taskObjectOverride = null;
-        CheckForLoopOverride(ref taskObjectOverride);
+        CheckForListOverride(ref taskObjectOverride);
 
         SwitchSetup(taskObjectOverride != null ? taskObjectOverride : _CurrentTask);
     }
@@ -135,17 +165,26 @@ public class TaskManager
     private void UpdateTask()
     {
         TaskObject taskObjectOverride = null;
-        CheckForLoopOverride(ref taskObjectOverride);
+        CheckForListOverride(ref taskObjectOverride);
 
         bool taskDone = SwitchUpdate(taskObjectOverride != null ? taskObjectOverride : _CurrentTask);
 
         if(taskDone)
         {
-            if(_CurrentTask.CurrentTaskType == TaskType.LOOP)
+            if(_CurrentTask.CurrentTaskType == TaskType.LIST)
             {
+                //Individual callback
                 taskObjectOverride?.FinishCallback?.Invoke();
-                ((TaskObject_Loop)_CurrentTask).UpdateIndex();
-                SetupTask();
+                //Move to next one, returns true if just a list
+                if(!((TaskObject_List)_CurrentTask).UpdateIndex())
+                {
+                    SetupTask();
+                }
+                else
+                {
+                    _CurrentTask.FinishCallback?.Invoke();
+                    _CurrentTask = null;
+                }    
             }
             else
             {
@@ -156,12 +195,12 @@ public class TaskManager
         }
     }
 
-    private void CheckForLoopOverride(ref TaskObject taskObjectOverride)
+    private void CheckForListOverride(ref TaskObject taskObjectOverride)
     {
-        if (_CurrentTask.CurrentTaskType == TaskType.LOOP)
+        if (_CurrentTask.CurrentTaskType == TaskType.LIST)
         {
             //Double cast, not great
-            taskObjectOverride = ((TaskObject_Loop)_CurrentTask).TaskObjectLoop[((TaskObject_Loop)_CurrentTask).TaskIndex];
+            taskObjectOverride = ((TaskObject_List)_CurrentTask).TaskObjectLoop[((TaskObject_List)_CurrentTask).TaskIndex];
         }
     }
 
@@ -189,6 +228,21 @@ public class TaskManager
                     taskDone = true;
                 }
                 break;
+            case TaskType.ATTACK:
+                TaskObject_Attack ta = ((TaskObject_Attack)taskObject);
+                if ((DateTime.Now - ta.LastAttack).TotalSeconds >= ta.TimeBetweenAttacks)
+                {
+                    if(ta.Enemy)
+                    {
+                        ta.Enemy.TakeDamage(ta.DamageAmt);
+                        ta.LastAttack = DateTime.Now;
+                    }
+                    else
+                    {
+                        taskDone = true;
+                    }                
+                }
+                break;
         }
         return taskDone;
     }
@@ -206,6 +260,9 @@ public class TaskManager
                 break;
             case TaskType.WORK:
                 ((Unit_Worker)_BaseUnitRef).StartWork();
+                break;
+            case TaskType.ATTACK:
+                _BaseUnitRef.StopAllMovement();
                 break;
         }
     }
@@ -234,17 +291,32 @@ public class TaskObject_Work:TaskObject
     public BaseWorkable Workable;
 }
 
-public class TaskObject_Loop : TaskObject
+public class TaskObject_Attack : TaskObject
+{
+    public BaseUnit Enemy;
+    public int DamageAmt;
+    public float TimeBetweenAttacks;
+    public DateTime LastAttack = DateTime.MinValue;
+}
+
+public class TaskObject_List : TaskObject
 {
     public int TaskIndex = 0;
+    public bool ShouldLoop;
     public List<TaskObject> TaskObjectLoop;
 
-    public void UpdateIndex()
+    public bool UpdateIndex()
     {
         ++TaskIndex;
         if(TaskIndex >= TaskObjectLoop.Count)
         {
-            TaskIndex = 0;
+            if(ShouldLoop)
+            {
+                TaskIndex = 0;
+                return false;
+            }
+            return true;
         }
+        return false;
     }
 }

@@ -23,6 +23,7 @@ namespace Data
     {
         public string BuildingName;
         public string PrefabName;
+        public int Health;
     }
 
     [Serializable]
@@ -36,6 +37,8 @@ namespace Data
     {
         public string UnitName;
         public string PrefabName;
+        public int Damage;
+        public int Health;
     }
 }
 

@@ -39,4 +39,9 @@ public class BaseUnit : BaseSelectable
     {
         EventManager.OnUnitDeath?.Invoke(this);
     }
+
+    public void StopAllMovement()
+    {
+        _NMA.ResetPath();
+    }
 }

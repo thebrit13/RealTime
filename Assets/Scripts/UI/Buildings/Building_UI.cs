@@ -18,7 +18,7 @@ public class Building_UI : Base_UI
             {
                 Instantiate<Building_Object_UI>(_UnitObject, _Content).Set(building.BuildingName,delegate
                 {
-                    EventManager.OnClickCreateBuilding?.Invoke(building.PrefabName);
+                    EventManager.OnClickCreateBuilding?.Invoke(building);
                     OnClickClose();
                 });
             }

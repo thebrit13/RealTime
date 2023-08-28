@@ -15,11 +15,14 @@
 		"UnitsList": [
 			{
 				"UnitName": "Worker",
-				"PrefabName": "UnitWorker"
+				"PrefabName": "UnitWorker",
+				"Health": "5"
 			},
 			{
 				"UnitName": "Soldier",
-				"PrefabName": "UnitSoldier"
+				"PrefabName": "UnitSoldier",
+				"Health": "10",
+				"Damage": "2"
 			}
 		]
 	}

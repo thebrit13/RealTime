@@ -9,7 +9,7 @@ public class Unit_Soldier : BaseUnit
 
     private float _AttackDelay = 1.0f;
 
-    private Coroutine _AttackCo;
+    //private Coroutine _AttackCo;
 
     public override void Update()
     {
@@ -33,17 +33,25 @@ public class Unit_Soldier : BaseUnit
             return;
         }
 
-        //TEMP
-        BaseUnit tempTarget = other.transform.parent.GetComponent<BaseUnit>();
-        if (tempTarget)
+        BaseUnit bu = other.transform.parent.GetComponent<BaseUnit>();
+        if(bu?.Team != this.Team)
         {
-            _CurrentTarget = tempTarget;
-            if (_AttackCo != null)
-            {
-                StopCoroutine(_AttackCo);
-            }
-            _AttackCo = StartCoroutine(Attack());
+            _TaskManager.AddTask(bu,_AttackDelay, 2);
         }
+
+        
+
+        //TEMP
+        //BaseUnit tempTarget = other.transform.parent.GetComponent<BaseUnit>();
+        //if (tempTarget)
+        //{
+        //    _CurrentTarget = tempTarget;
+        //    if (_AttackCo != null)
+        //    {
+        //        StopCoroutine(_AttackCo);
+        //    }
+        //    _AttackCo = StartCoroutine(Attack());
+        //}
     }
 
     private void OnTriggerExit(Collider other)
@@ -60,21 +68,17 @@ public class Unit_Soldier : BaseUnit
 
         if (other.gameObject == _CurrentTarget.gameObject)
         {
-            _CurrentTarget = null;
-            if (_AttackCo != null)
-            {
-                StopCoroutine(_AttackCo);
-            }
+            _TaskManager.ClearAllTasks();
         }
     }
 
-    IEnumerator Attack()
-    {
-        _NMA.ResetPath();
-        while (_CurrentTarget)
-        {
-            _CurrentTarget.TakeDamage(2);
-            yield return new WaitForSeconds(_AttackDelay);
-        }
-    }
+    //IEnumerator Attack()
+    //{
+    //    _NMA.ResetPath();
+    //    while (_CurrentTarget)
+    //    {
+    //        _CurrentTarget.TakeDamage(2);
+    //        yield return new WaitForSeconds(_AttackDelay);
+    //    }
+    //}
 }

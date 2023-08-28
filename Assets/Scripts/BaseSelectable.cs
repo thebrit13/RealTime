@@ -14,7 +14,7 @@ public class BaseSelectable : MonoBehaviour
 
     private GameObject _Active2D;
 
-    private int _Team;
+    public int Team;
 
     private bool _Movable;
 
@@ -27,9 +27,15 @@ public class BaseSelectable : MonoBehaviour
         return _Movable;
     }
 
-    public virtual void Setup(int teamNumber)
+    public virtual void Setup(int teamNumber,int health)
     {
-        _Team = teamNumber;
+        Team = teamNumber;
+        _Health = health;
+
+        if (DebugHelper.Instance.UseTeamNumberOverride)
+        {
+            Team = DebugHelper.Instance.TeamNumberOverride;
+        }
     }
 
     public virtual void Awake()

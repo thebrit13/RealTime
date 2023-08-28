@@ -25,9 +25,9 @@ public class BaseBuilding : BaseSelectable
         _Collider.enabled = false;
     }
 
-    public void Setup(int teamNumber,BuildingType bt)
+    public void Setup(int teamNumber,int health,BuildingType bt)
     {
-        base.Setup(teamNumber);
+        base.Setup(teamNumber,health);
         _NMO.enabled = true;
         _Collider.enabled = true;
         OnClick += OnClickFunc;
@@ -45,8 +45,8 @@ public class BaseBuilding : BaseSelectable
         OnClick -= OnClickFunc;
     }
 
-    private void CreateUnit(string prefabName)
+    private void CreateUnit(Data.Unit unitData)
     {
-        EventManager.OnCreateUnit?.Invoke(prefabName, _UnitSpawnLocation.position);
+        EventManager.OnCreateUnit?.Invoke(unitData, _UnitSpawnLocation.position);
     }
 }

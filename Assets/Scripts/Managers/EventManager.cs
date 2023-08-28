@@ -4,11 +4,11 @@ using UnityEngine;
 
 public static class EventManager
 {
-    public static System.Action<string> OnClickCreateBuilding;
+    public static System.Action<Data.Building> OnClickCreateBuilding;
 
     public static System.Action<BaseUnit> OnUnitDeath;
 
-    public static System.Action<string, Vector3> OnCreateUnit;
+    public static System.Action<Data.Unit, Vector3> OnCreateUnit;
 
     public delegate Vector3 GetClosestDropOffDel(Vector3 unitPos);
 

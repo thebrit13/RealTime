@@ -19,7 +19,7 @@ public class BuildingManager : MonoBehaviour
 
     private List<BaseBuilding> _CreatedBuildings = new List<BaseBuilding>();
 
-    //private RaycastHit _MouseHit;
+    private Data.Building _CurrentData = null;
 
     private void Awake()
     {
@@ -42,17 +42,18 @@ public class BuildingManager : MonoBehaviour
 
     public void PlaceBuilding()
     {
-        _CreatedBaseBuilding.Setup(1,BuildingType.SPAWNER);
+        _CreatedBaseBuilding.Setup(1, _CurrentData.Health,BuildingType.SPAWNER);
         _CreatedBuildings.Add(_CreatedBaseBuilding);
         _CreatedBaseBuilding = null;
     }
 
-    public void CreateBuildingAtWorldPos(string prefabName)
+    public void CreateBuildingAtWorldPos(Data.Building buildingData)
     {
-        BaseBuilding buildingToCreate = _Buildings.Find(o => o.name == prefabName);
+        BaseBuilding buildingToCreate = _Buildings.Find(o => o.name == buildingData.PrefabName);
 
         if(buildingToCreate)
         {
+            _CurrentData = buildingData;
             _CreatedBaseBuilding = Instantiate<BaseBuilding>(buildingToCreate);
         }
 

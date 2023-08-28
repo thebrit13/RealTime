@@ -70,7 +70,7 @@ public class UIManager : MonoBehaviour
         _BuildingMenuUI.Set();
     }
 
-    public BuildingInfo_UI ShowInfo_Building(System.Action<string> onClickOption)
+    public BuildingInfo_UI ShowInfo_Building(System.Action<Data.Unit> onClickOption)
     {
         ShowUI_Master(_BuildingInfoUI.gameObject);
 
