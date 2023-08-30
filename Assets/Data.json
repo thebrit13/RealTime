@@ -14,16 +14,30 @@
 	"Units": {
 		"UnitsList": [
 			{
+				"ID":"Worker1",
 				"UnitName": "Worker",
 				"PrefabName": "UnitWorker",
 				"Health": "5"
 			},
 			{
+				"ID": "Soldier1",
 				"UnitName": "Soldier",
 				"PrefabName": "UnitSoldier",
 				"Health": "10",
 				"Damage": "2"
 			}
 		]
-	}
+	},
+	"Waves": [
+		{
+			"Number": "1",
+			"Units": [
+				{
+					"SpawnTime": "2",
+					"ID": "Soldier1",
+					"Amt": "5"
+				}
+			]
+		}
+	]
 }

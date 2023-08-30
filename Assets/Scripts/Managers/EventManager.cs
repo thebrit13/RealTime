@@ -8,7 +8,7 @@ public static class EventManager
 
     public static System.Action<BaseUnit> OnUnitDeath;
 
-    public static System.Action<Data.Unit, Vector3> OnCreateUnit;
+    public static System.Action<Data.Unit, Vector3,int> OnCreateUnit;
 
     public delegate Vector3 GetClosestDropOffDel(Vector3 unitPos);
 

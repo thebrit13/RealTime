@@ -10,13 +10,16 @@ namespace Data
     {
         public Buildings Buildings;
         public Units Units;
+        public List<Wave> Waves;
     }
 
+    #region Buildings
     [Serializable]
     public class Buildings
     {
         public List<Building> BuildingsList;
     }
+    #endregion
 
     [Serializable]
     public class Building
@@ -26,20 +29,45 @@ namespace Data
         public int Health;
     }
 
+    #region Units
     [Serializable]
     public class Units
     {
         public List<Unit> UnitsList;
+
+        public Unit GetUnitByID(string ID)
+        {
+            return UnitsList.Find(o => o.ID == ID);
+        }
     }
 
     [Serializable]
     public class Unit
     {
+        public string ID;
         public string UnitName;
         public string PrefabName;
         public int Damage;
         public int Health;
     }
+    #endregion
+
+    #region Waves
+    [Serializable]
+    public class Wave
+    {
+        public int Number;
+        public List<WaveUnitInfo> Units;
+    }
+
+    [Serializable]
+    public class WaveUnitInfo
+    {
+        public float SpawnTime;
+        public string ID;
+        public int Amt;
+    }
+    #endregion
 }
 
 

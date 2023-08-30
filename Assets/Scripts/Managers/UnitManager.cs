@@ -23,13 +23,13 @@ public class UnitManager : MonoBehaviour
     
     }
 
-    public void CreateUnit(Data.Unit unitData,Vector3 loc)
+    public void CreateUnit(Data.Unit unitData,Vector3 loc,int teamNumber)
     {
         BaseUnit bu = _Units.Find(o => o.name == unitData.PrefabName);
         if(bu)
         {
             BaseUnit buCreated = Instantiate(bu, loc, Quaternion.identity);
-            buCreated.Setup(1,unitData.Health);
+            buCreated.Setup(teamNumber, unitData.Health,unitData.Damage);
             _CreatedUnits.Add(buCreated);
         }    
     }

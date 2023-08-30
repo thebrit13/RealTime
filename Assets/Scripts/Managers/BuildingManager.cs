@@ -42,7 +42,7 @@ public class BuildingManager : MonoBehaviour
 
     public void PlaceBuilding()
     {
-        _CreatedBaseBuilding.Setup(1, _CurrentData.Health,BuildingType.SPAWNER);
+        _CreatedBaseBuilding.Setup(1, _CurrentData.Health,0,BuildingType.SPAWNER);
         _CreatedBuildings.Add(_CreatedBaseBuilding);
         _CreatedBaseBuilding = null;
     }

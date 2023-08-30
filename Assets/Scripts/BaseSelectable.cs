@@ -18,7 +18,8 @@ public class BaseSelectable : MonoBehaviour
 
     private bool _Movable;
 
-    private int _Health = 5;
+    protected int Health;
+    protected int Damage;
 
     protected System.Action OnClick;
 
@@ -27,10 +28,11 @@ public class BaseSelectable : MonoBehaviour
         return _Movable;
     }
 
-    public virtual void Setup(int teamNumber,int health)
+    public virtual void Setup(int teamNumber,int health,int damage)
     {
         Team = teamNumber;
-        _Health = health;
+        Health = health;
+        Damage = damage;
 
         if (DebugHelper.Instance.UseTeamNumberOverride)
         {
@@ -71,9 +73,8 @@ public class BaseSelectable : MonoBehaviour
 
     public void TakeDamage(int amt)
     {
-        Debug.Log("Take damage");
-        _Health -= amt;
-        if(_Health <= 0)
+        Health -= amt;
+        if(Health <= 0)
         {
             Destroy(this.gameObject);
         }

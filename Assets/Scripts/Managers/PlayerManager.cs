@@ -11,12 +11,19 @@ public enum ResourceType
 public class PlayerManager : MonoBehaviour
 {
     [SerializeField] private TextAsset _DataAsset;
+    [SerializeField] private WaveManager _WaveManager;
 
     public static PlayerManager Instance;
 
     private Dictionary<ResourceType, int> _Resources;
 
     private DataManager _DataManager;
+    public DataManager DataManager { 
+        get
+        {
+            return _DataManager;
+        }
+    }
 
 
     private void Awake()
@@ -28,7 +35,16 @@ public class PlayerManager : MonoBehaviour
 
     private void Start()
     {
-        _DataManager.LoadData();
+        StartCoroutine(LoadDataAndStart());
+    }
+
+    IEnumerator LoadDataAndStart()
+    {
+        Debug.Log("Loading Data");
+        yield return _DataManager.LoadData();
+        Debug.Log("Finished Loading Data");
+
+        _WaveManager.Setup(_DataManager.DataClass.Waves);
 
         EventManager.StartGameLogic?.Invoke();
     }

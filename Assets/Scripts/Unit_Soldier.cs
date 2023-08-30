@@ -37,6 +37,7 @@ public class Unit_Soldier : BaseUnit
         if(bu?.Team != this.Team)
         {
             _TaskManager.AddTask(bu,_AttackDelay, 2);
+            _CurrentTarget = bu;
         }
 
         
@@ -69,6 +70,7 @@ public class Unit_Soldier : BaseUnit
         if (other.gameObject == _CurrentTarget.gameObject)
         {
             _TaskManager.ClearAllTasks();
+            _CurrentTarget = null;
         }
     }
 

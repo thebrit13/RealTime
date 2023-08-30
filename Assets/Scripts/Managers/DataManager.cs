@@ -14,9 +14,10 @@ namespace Data
             _JSONData = JsonData;
         }
 
-        public void LoadData()
+        public IEnumerator LoadData()
         {
             DataClass = JsonUtility.FromJson<DataClass>(_JSONData);
+            yield return null;
         }
     }
 }
