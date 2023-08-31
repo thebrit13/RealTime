@@ -5,17 +5,18 @@ using UnityEngine;
 
 public class WaveManager : MonoBehaviour
 {
-    [SerializeField] private Transform _SpawnLoc;
+    [SerializeField] private List<Transform> _SpawnLoc;
 
     private List<Data.Wave> _WaveInfo;
 
-    private int _CurrentWave = -1;
+    private int _CurrentWave;
 
     private List<Coroutine> _CoroutineList = new List<Coroutine>();
 
     private void Awake()
     {
         EventManager.StartGameLogic += StartWaveLogic;
+        EventManager.WaveComplete += StartNextWave;
     }
 
     public void Setup(List<Data.Wave> waveInfo)
@@ -25,10 +26,9 @@ public class WaveManager : MonoBehaviour
 
     public void StartWaveLogic()
     {
-        _CurrentWave = 1;
         if(_WaveInfo != null)
         {
-            StartWave(_CurrentWave);
+            StartNextWave();
         }
         else
         {
@@ -36,10 +36,11 @@ public class WaveManager : MonoBehaviour
         }
     }
 
-    public void StartWave(int waveNumber)
+    public void StartNextWave()
     {
-        Debug.Log(string.Format("Starting Wave {0}", waveNumber));
-        Data.Wave wave = _WaveInfo.Find(o => o.Number == waveNumber);
+        ++_CurrentWave;
+        Debug.Log(string.Format("Starting Wave {0}", _CurrentWave));
+        Data.Wave wave = _WaveInfo.Find(o => o.Number == _CurrentWave);
         if(wave != null)
         {
             foreach(Data.WaveUnitInfo unitInfo in wave.Units)
@@ -57,7 +58,7 @@ public class WaveManager : MonoBehaviour
         Data.Unit unitInfo = PlayerManager.Instance.DataManager.DataClass.Units.GetUnitByID(waveInfo.ID);
         for(int i = 0; i < waveInfo.Amt;i++)
         {
-            EventManager.OnCreateUnit(unitInfo, _SpawnLoc.position,2);
+            EventManager.OnCreateUnit(unitInfo, _SpawnLoc[Random.Range(0,_SpawnLoc.Count)].position,2);
         }
     }
 
@@ -72,5 +73,7 @@ public class WaveManager : MonoBehaviour
                 StopCoroutine(co);
             }
         }
+
+        EventManager.WaveComplete -= StartNextWave;
     }
 }

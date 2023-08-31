@@ -15,4 +15,6 @@ public static class EventManager
     public static GetClosestDropOffDel GetClosestDropOff;
 
     public static System.Action StartGameLogic;
+
+    public static System.Action WaveComplete;
 }

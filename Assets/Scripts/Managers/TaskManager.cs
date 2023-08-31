@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 public enum TaskType
@@ -15,8 +16,10 @@ public enum TaskType
 
 public class TaskManager
 {
-    private DateTime _LastUpdateTime = DateTime.MinValue;
+    private DateTime _LastTaskUpdateTime = DateTime.MinValue;
+    private DateTime _LastAIUpdateTime = DateTime.MinValue;
     private const float TASK_UPDATE_INTERVAL = .2f;
+    private const float AI_UPDATE_INTERVAL = .2f;
 
     private TaskObject _CurrentTask;
 
@@ -30,10 +33,13 @@ public class TaskManager
 
     private BaseUnit _BaseUnitRef;
 
-    public void Setup(BaseUnit unitRef,System.Action<Vector3> moveCallback)
+    private bool _IsAI;
+
+    public void Setup(BaseUnit unitRef,bool isAI,System.Action<Vector3> moveCallback)
     {
         _BaseUnitRef = unitRef;
         _MoveToCallback = moveCallback;
+        _IsAI = isAI;
     }
 
     public void ClearAllTasks()
@@ -52,11 +58,13 @@ public class TaskManager
         AddTaskInternal(to,addTask);
     }
 
-    public void AddTask(Vector3 destination, bool addTask = false)
+    public void AddTask(Vector3 destination,Transform followObject, bool addTask = false)
     {
         TaskObject_Move to = new TaskObject_Move()
         {
             CurrentTaskType = TaskType.MOVE,
+            FollowObject = followObject,
+            StoppingDistance = STOPPING_DISTANCE_FOR_MOVE,
             Destination = destination
         };
         AddTaskInternal(to,addTask);
@@ -136,13 +144,20 @@ public class TaskManager
 
     public void UpdateTaskManager()
     {
-        if(_CurrentTask != null)    
+        if (_IsAI && (DateTime.Now - _LastAIUpdateTime).TotalSeconds > AI_UPDATE_INTERVAL)
         {
-            if((DateTime.Now - _LastUpdateTime).TotalSeconds > TASK_UPDATE_INTERVAL)
+            UpdateAI();
+            _LastAIUpdateTime = DateTime.Now;
+        }
+
+        if (_CurrentTask != null)    
+        {
+            if((DateTime.Now - _LastTaskUpdateTime).TotalSeconds > TASK_UPDATE_INTERVAL)
             {
                 UpdateTask();
-                _LastUpdateTime = DateTime.Now;
+                _LastTaskUpdateTime = DateTime.Now;
             }
+
         }
         else
         {
@@ -152,6 +167,21 @@ public class TaskManager
                 SetupTask();
             }
         }
+    }
+
+    private void UpdateAI()
+    {
+        if(_CurrentTask != null)
+        {
+            return;
+        }
+        //check for visual to attack
+        //attack (should be handled automatically)
+        //move for x amount of seconds
+        //Will probably want to have transforms set this max min
+        float xLoc = UnityEngine.Random.Range(-50.0f, 50.0f);
+        float yLoc = UnityEngine.Random.Range(-50.0f, 50.0f);
+        AddTask(new Vector3(xLoc, 0, yLoc),null);
     }
 
     private void SetupTask()
@@ -211,9 +241,19 @@ public class TaskManager
         {
             case TaskType.MOVE:
                 //double cast!!
-                if (Vector3.Distance(((TaskObject_Move)taskObject).Destination, _BaseUnitRef.transform.position) < ((TaskObject_Move)taskObject).StoppingDistance)
+                TaskObject_Move tom = (TaskObject_Move)taskObject;
+                if (Vector3.Distance(tom.Destination, _BaseUnitRef.transform.position) < tom.StoppingDistance)
                 {
                     taskDone = true;
+                }
+                else
+                {
+                    //Update destination to account for following object
+                    if(tom.FollowObject)
+                    {
+                        tom.Destination = tom.FollowObject.transform.position;
+                        _MoveToCallback?.Invoke(tom.Destination);
+                    }
                 }
                 break;
             case TaskType.WAIT:
@@ -283,6 +323,7 @@ public class TaskObject_Wait : TaskObject
 public class TaskObject_Move:TaskObject
 {
     public Vector3 Destination;
+    public Transform FollowObject;
     public float StoppingDistance;
 }
 

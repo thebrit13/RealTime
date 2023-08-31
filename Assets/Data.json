@@ -33,6 +33,16 @@
 			"Number": "1",
 			"Units": [
 				{
+					"SpawnTime": "1",
+					"ID": "Soldier1",
+					"Amt": "1"
+				}
+			]
+		},
+		{
+			"Number": "2",
+			"Units": [
+				{
 					"SpawnTime": "2",
 					"ID": "Soldier1",
 					"Amt": "5"

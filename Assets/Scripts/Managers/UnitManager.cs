@@ -9,7 +9,8 @@ public class UnitManager : MonoBehaviour
     [Header("Units")]
     [SerializeField] private List<BaseUnit> _Units;
 
-    private List<BaseUnit> _CreatedUnits = new List<BaseUnit>();
+    private Dictionary<int, List<BaseUnit>> _CreatedUnits = new Dictionary<int, List<BaseUnit>>();
+    //private List<BaseUnit> _CreatedUnits = new List<BaseUnit>();
 
     private void Awake()
     {
@@ -30,15 +31,20 @@ public class UnitManager : MonoBehaviour
         {
             BaseUnit buCreated = Instantiate(bu, loc, Quaternion.identity);
             buCreated.Setup(teamNumber, unitData.Health,unitData.Damage);
-            _CreatedUnits.Add(buCreated);
+
+            if(!_CreatedUnits.ContainsKey(teamNumber))
+            {
+                _CreatedUnits.Add(teamNumber, new List<BaseUnit>());
+            }
+            _CreatedUnits[teamNumber].Add(buCreated);
         }    
     }
 
-    public void MoveSelectedCallback(List<BaseUnit> selectedUnits,Vector3 pos)
+    public void MoveSelectedCallback(List<BaseUnit> selectedUnits,Vector3 pos,Transform followObject)
     {
         foreach (BaseUnit bu in selectedUnits)
         {
-            bu.MoveTo(pos);
+            bu.MoveTo(pos,followObject);
         }
     }
 
@@ -53,9 +59,9 @@ public class UnitManager : MonoBehaviour
         }
     }
 
-    public List<BaseUnit> GetCreatedUnits()
+    public List<BaseUnit> GetCreatedUnits(int teamNumber)
     {
-        return _CreatedUnits;
+        return _CreatedUnits.ContainsKey(teamNumber)?_CreatedUnits[teamNumber]:new List<BaseUnit>();
     }
 
     private void OnUnitDeath(BaseUnit bu)
@@ -64,8 +70,12 @@ public class UnitManager : MonoBehaviour
         {
             return;
         }
+        _CreatedUnits[bu.Team].Remove(bu);
 
-        _CreatedUnits.Remove(bu);
+        if (bu.Team != 1 && _CreatedUnits[bu.Team].Count == 0)
+        {
+            EventManager.WaveComplete?.Invoke();
+        }
     }
 
     private void OnDestroy()

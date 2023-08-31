@@ -18,9 +18,12 @@ public class SelectionManager : MonoBehaviour
     private bool _SelectionInProgress = false;
 
     private BaseSelectable _WorldMouseUnitHit = null;
+    private BaseSelectable _WorldMouseEnemyUnitHit = null;
     private BaseWorkable _WorldMouseWorkableHit = null;
 
     private List<BaseUnit> _SelectedUnits = new List<BaseUnit>();
+
+    private const int TEAM_NUMBER = 1;
 
     private void Awake()
     {
@@ -64,18 +67,18 @@ public class SelectionManager : MonoBehaviour
             SelectionEnd();
         }
 
-        if (Input.GetMouseButtonUp(1))
+        if (Input.GetMouseButtonDown(1))
         {
             if(_SelectedUnits?.Count > 0)
             {
-                SetMouseWorld(true, true);
+                SetMouseWorld(true, true,true);
                 if (_WorldMouseWorkableHit != null)
                 {
                     _UnitManagerRef?.StartWorkCallback(_SelectedUnits, _WorldMouseWorkableHit);
                 }
                 else
                 {
-                    _UnitManagerRef?.MoveSelectedCallback(_SelectedUnits, _MouseWorldPos);
+                    _UnitManagerRef?.MoveSelectedCallback(_SelectedUnits, _MouseWorldPos, _WorldMouseEnemyUnitHit?.transform);
                 }
             }
         }
@@ -87,11 +90,14 @@ public class SelectionManager : MonoBehaviour
         }
     }
 
-    private void SetMouseWorld(bool checkForUnit,bool checkForWorkable)
+    private void SetMouseWorld(bool checkForUnit,bool checkForWorkable,bool rmb = false)
     {
         if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out _MouseHit))
         {
             _MouseWorldPos = _MouseHit.point;
+
+            //Enemy only
+            _WorldMouseEnemyUnitHit = null;
 
             //LMB - check for unit to select
             //RMB - check for unit to attack
@@ -99,16 +105,27 @@ public class SelectionManager : MonoBehaviour
             {
                 if (_MouseHit.transform.tag == "Unit" || _MouseHit.transform.tag == "Building")
                 {
-                    _WorldMouseUnitHit = _MouseHit.transform.GetComponent<BaseSelectable>();
+                    BaseSelectable tempBS = _MouseHit.transform.GetComponent<BaseSelectable>();
+                    if(tempBS?.Team == TEAM_NUMBER)
+                    {
+                        _WorldMouseUnitHit = tempBS;
+                    }
+                    else if(rmb)
+                    {
+                        _WorldMouseEnemyUnitHit = tempBS;
+                    }
                 }
                 else
                 {
-                    _WorldMouseUnitHit?.SetSelectionState(UnitSelectionState.NONE,false);
-                    _WorldMouseUnitHit = null;
+                    if(!rmb)
+                    {
+                        _WorldMouseUnitHit?.SetSelectionState(UnitSelectionState.NONE, false);
+                        _WorldMouseUnitHit = null;
+                    }
                 }
             }
 
-            //RM - check for tree/mine to work
+            //RMB - check for tree/mine to work
             if(checkForWorkable)
             {
                 if (_MouseHit.transform.tag == "Workable")
@@ -165,7 +182,7 @@ public class SelectionManager : MonoBehaviour
         Vector3 topLeft = new Vector3(Mathf.Min(_MouseDown.x, _MouseWorldPos.x), 0, Mathf.Max(_MouseDown.z, _MouseWorldPos.z));
         Vector3 bottomRight = new Vector3(Mathf.Max(_MouseDown.x, _MouseWorldPos.x), 0, Mathf.Min(_MouseDown.z, _MouseWorldPos.z));
 
-        foreach (BaseUnit bu in _UnitManagerRef?.GetCreatedUnits())
+        foreach (BaseUnit bu in _UnitManagerRef?.GetCreatedUnits(TEAM_NUMBER))
         {
             if (IsInSelection(bu.transform.position, topLeft, bottomRight))
             {

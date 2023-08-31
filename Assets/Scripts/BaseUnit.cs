@@ -15,8 +15,14 @@ public class BaseUnit : BaseSelectable
         //to active nav mesh agent when spawned, might not need
         _NMA.SetDestination(this.transform.position + this.transform.forward);
 
+
+    }
+
+    public override void Setup(int teamNumber, int health, int damage)
+    {
+        base.Setup(teamNumber, health, damage);
         _TaskManager = new TaskManager();
-        _TaskManager.Setup(this, MoveToInternal);
+        _TaskManager.Setup(this,teamNumber != 1, MoveToInternal);
     }
 
     public virtual void Update()
@@ -24,9 +30,9 @@ public class BaseUnit : BaseSelectable
         _TaskManager?.UpdateTaskManager();
     }
 
-    public void MoveTo(Vector3 dest)
+    public void MoveTo(Vector3 dest,Transform followObjects)
     {
-        _TaskManager.AddTask(dest);
+        _TaskManager.AddTask(dest, followObjects);
     }
 
     private void MoveToInternal(Vector3 dest)
